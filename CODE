@@ -1,6 +1,6 @@
-# SCRIPT FOR ANALYSING NM-MRI DATA USING A STANDERDIZED MASK
+'''SCRIPT FOR ANALYSING NM-MRI DATA USING A STANDERDIZED MASK'''
 
-##################################################################################################################################################################
+#####################################################################################################################################
 
 # Download the probability masks of the SN via: https://www.nitrc.org/projects/atag. Here choose the files for the Substantia Nigra for young, middle age and old. A different mask was used for young participants (<35 years) and middle-aged participants (>35 years),and old participants (>60)
 # After downloading, binerize and threshold the propability mask
@@ -12,7 +12,7 @@ fslmaths /Users/USER/FOLDER/SN_Masks/SN_R_prob_mni_linear_young.nii -thr 3 -bin 
 fslmaths /Users/USER/FOLDER/SN_Masks/SN_L_prob_mni_linear_elderly.nii -thr 3 -bin /Users/USER/FOLDER/SN_Masks/SN_L_prob_mni_linear_elderly_bin.nii
 fslmaths /Users/USER/FOLDER/SN_Masks/SN_R_prob_mni_linear_elderly.nii -thr 3 -bin /Users/USER/FOLDER/SN_Masks/SN_R_prob_mni_linear_elderly_bin.nii
 
-##################################################################################################################################################################
+#######################################################################################################################################
 
 # PREPROCES THE WHOLE BRAIN ANATOMICAL IMAGES 
 
@@ -30,7 +30,7 @@ a.	Open Matlab R2133 via search/finder:
                                                            iii.      x2 click on presurf_INV2.
 1.	run
 
-##################################################################################################################################################################
+########################################################################################################################################
 
 # TWO STEP REGISTRATION OF THE NM-MRI SCAN TO THE SN MASK SPACE 
 
@@ -63,7 +63,8 @@ applywarp --in=$MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_T1.nii --ref=$MAIN_DIR/${SUBJ
 Flirt -in /Users/USERNAME/fsl/data/standard/MNI152_T1_2mm.nii.gz -ref /Users/USERNAME/fsl/data/standard/MNI152_T1_0.5mm.nii -out /Users/USERNAME/FOLDER/SN_Masks/MNI_2mm_to_0.5mm.nii.gz -omat /Users/USERNAME/FOLDER/SN_Masks/MNI_2mm_to_0.5mm.mat
 FLIRT -in $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_MNI.nii -ref /Users/USERNAME/fsl/data/standard/MNI152_T1_0.5mm -applyxfm -init /Users/USERNAME/FOLDER/SN_Masks/MNI_2mm_to_0.5mm.mat -out $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_final.nii -cost corratio -interp spline -dof 6
 
-##################################################################################################################################################################
+##############################################################################################################################################
+
 
 # SELECT THREE SLICES OF THE NM-MRI SCAN AND THE SN MASK
 # Masks are made by selecting 3 up following slices from the ATAG SN mask for the substantia nigra. The slice number was selected by taking the median of the selected slice numbers for all included subjects. This resulted in slices 113-115 for the inferior mask and 118-120 for the middle mask. We choose only the inferior SN which is indicated in the code, but can be adjusted.  
@@ -110,7 +111,7 @@ Echo “Signal intensity CP R for ${SUBJ}”
 
 done
 
-##################################################################################################################################################################
+#####################################################################################################################
 
 # ANALYSIS FOR OUTLIERS
 

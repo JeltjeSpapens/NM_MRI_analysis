@@ -2,8 +2,8 @@
 
 #####################################################################################################################################
 
-# Download the probability masks of the SN via: https://www.nitrc.org/projects/atag. Here choose the files for the Substantia Nigra for young, middle age and old. A different mask was used for young participants (<35 years) and middle-aged participants (>35 years),and old participants (>60)
-# After downloading, binerize and threshold the propability mask
+% Download the probability masks of the SN via: https://www.nitrc.org/projects/atag. Here choose the files for the Substantia Nigra for young, middle age and old. A different mask was used for young participants (<35 years) and middle-aged participants (>35 years),and old participants (>60)
+% After downloading, binerize and threshold the propability mask
 
 fslmaths /Users/USER/FOLDER/SN_Masks/SN_L_prob_mni_linear_middle_age.nii -thr 3 -bin /Users/USER/FOLDER/SN_Masks/SN_L_prob_mni_linear_middle_age_bin.nii
 fslmaths /Users/USER/FOLDER/SN_Masks/SN_R_prob_mni_linear_middle_age.nii -thr 3 -bin /Users/USER/FOLDER/SN_Masks/SN_R_prob_mni_linear_middle_age_bin.nii
@@ -14,11 +14,11 @@ fslmaths /Users/USER/FOLDER/SN_Masks/SN_R_prob_mni_linear_elderly.nii -thr 3 -bi
 
 #######################################################################################################################################
 
-# PREPROCES THE WHOLE BRAIN ANATOMICAL IMAGES 
+% PREPROCES THE WHOLE BRAIN ANATOMICAL IMAGES 
 
-#Download the presufer script from : https://github.com/srikash/presurfer?tab=readme-ov-file#presurfer-
-#This script is eveloped by Sriranga Kashyap (Maastricht University), to denois and brainstrip the MRI image 
-#Follow the instructions to follow the script in Matlab:
+% Download the presufer script from : https://github.com/srikash/presurfer?tab=readme-ov-file#presurfer-
+% This script is eveloped by Sriranga Kashyap (Maastricht University), to denois and brainstrip the MRI image 
+% Follow the instructions to follow the script in Matlab:
 
 a.	Open Matlab R2133 via search/finder:
                                                               i.      Go in the current folder to Home/FOLDER/scripts/presurfer-main/func
@@ -32,33 +32,33 @@ a.	Open Matlab R2133 via search/finder:
 
 ########################################################################################################################################
 
-# TWO STEP REGISTRATION OF THE NM-MRI SCAN TO THE SN MASK SPACE 
+% TWO STEP REGISTRATION OF THE NM-MRI SCAN TO THE SN MASK SPACE 
 
-# Use FSL-anat to non-linear register the UNI image to MNI space. 
-# Copy paste the code in your terminal. Fill in the subject number you want to analyse on the ...
+% Use FSL-anat to non-linear register the UNI image to MNI space. 
+% Copy paste the code in your terminal. Fill in the subject number you want to analyse on the ...
 
 MAIN_DIR=/Users/USERNAME/FOLDER/Subjects
 for i in ...; do 
 SUBJ="MRS_$i"
 fsl_anat -i $MAIN_DIR/${SUBJ}/presurf_MPRAGEise/${SUBJ}_UNI_MPRAGEised.nii -o $MAIN_DIR/${SUBJ}/${SUBJ}_fsl
 
-# Use freesufer to correct the voxel size of the anatomical image, so no resolution is lost of the NM-MRI slap. 
+% Use freesufer to correct the voxel size of the anatomical image, so no resolution is lost of the NM-MRI slap. 
 
 export FREESURFER_HOME=/Applications/freesurfer/7.4.1
 export SUBJECTS_DIR=$MAIN_DIR/${SUBJ}
 source $FREESURFER_HOME/SetUpFreeSurfer.sh
 mri_convert -rt cubic -vs 0.4 0.4 0.5 $MAIN_DIR/${SUBJ}/${SUBJ}_fsl.anat/T1_to_MNI_nonlin.nii.gz $MAIN_DIR/${SUBJ}/${SUBJ}_T1_to_MNI_upsamp.nii
 
-# Registration NM-MRI to T1 with FSL FLIRT
-# If the registration does not work: decrease the degrees of freedom to -dof 6
+% Registration NM-MRI to T1 with FSL FLIRT
+% If the registration does not work: decrease the degrees of freedom to -dof 6
 
 FLIRT -in $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl.nii -ref $MAIN_DIR/${SUBJ}/${SUBJ}_fsl.anat/T1_biascorr.nii.gz -out $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_T1.nii -cost corratio -interp spline -dof 12 -searchrx -10 10 -searchry -10 10 -searchrz -10 10
 
-# Registration of NM-MRI imagage to MNI 2mm space by using the warpfield created in FSL-anat
+% Registration of NM-MRI imagage to MNI 2mm space by using the warpfield created in FSL-anat
 
 applywarp --in=$MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_T1.nii --ref=$MAIN_DIR/${SUBJ}/${SUBJ}_T1_to_MNI_upsamp.nii.gz -w $MAIN_DIR/${SUBJ}/${SUBJ}_fsl.anat/T1_to_MNI_nonlin_field -o $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_MNI.nii --interp=nn
 
-# Registration of NM-MRI image to MNI 0.5mm space 
+% Registration of NM-MRI image to MNI 0.5mm space 
 
 Flirt -in /Users/USERNAME/fsl/data/standard/MNI152_T1_2mm.nii.gz -ref /Users/USERNAME/fsl/data/standard/MNI152_T1_0.5mm.nii -out /Users/USERNAME/FOLDER/SN_Masks/MNI_2mm_to_0.5mm.nii.gz -omat /Users/USERNAME/FOLDER/SN_Masks/MNI_2mm_to_0.5mm.mat
 FLIRT -in $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_MNI.nii -ref /Users/USERNAME/fsl/data/standard/MNI152_T1_0.5mm -applyxfm -init /Users/USERNAME/FOLDER/SN_Masks/MNI_2mm_to_0.5mm.mat -out $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_final.nii -cost corratio -interp spline -dof 6
@@ -66,8 +66,8 @@ FLIRT -in $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_to_MNI.nii -ref /Users/USERNAME/fsl/d
 ##############################################################################################################################################
 
 
-# SELECT THREE SLICES OF THE NM-MRI SCAN AND THE SN MASK
-# Masks are made by selecting 3 up following slices from the ATAG SN mask for the substantia nigra. The slice number was selected by taking the median of the selected slice numbers for all included subjects. This resulted in slices 113-115 for the inferior mask and 118-120 for the middle mask. We choose only the inferior SN which is indicated in the code, but can be adjusted.  
+% SELECT THREE SLICES OF THE NM-MRI SCAN AND THE SN MASK
+% Masks are made by selecting 3 up following slices from the ATAG SN mask for the substantia nigra. The slice number was selected by taking the median of the selected slice numbers for all included subjects. This resulted in slices 113-115 for the inferior mask and 118-120 for the middle mask. We choose only the inferior SN which is indicated in the code, but can be adjusted.  
 
 MAIN_DIR="/Users/USERNAME/FOLDER/Subjects"
 MASK_DIR="/Users/USERNAME/FOLDER/SN_Masks"
@@ -83,7 +83,7 @@ fslroi $MASK_DIR/SN_L_prob_mni_linear_${AGE}_bin.nii $MASK_DIR/${MASK}/SN_L_${AG
 fslroi $MASK_DIR/SN_R_prob_mni_linear_${AGE}_bin.nii $MASK_DIR/${MASK}/SN_R_${AGE}_${MASK}_${SLICE}_new.nii 0 -1 0 -1 ${SLICE1} 3
 fslroi $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_final.nii.gz $MAIN_DIR/${SUBJ}/${SUBJ}_MT_tfl_SN_${MASK}_roi.nii.gz 0 -1 0 -1 ${SLICE1} 3
 
-# MEASURE THE MEAN INTENSITY OF THE VOXEL IN THE ROI AND REFERENCE MASK OF THE NM-MRI SCAN
+% MEASURE THE MEAN INTENSITY OF THE VOXEL IN THE ROI AND REFERENCE MASK OF THE NM-MRI SCAN
 
 MAIN_DIR="/Users/USERNAME/FOLDER/Subjects"
 MASK_DIR="/Users/USERNAME/FOLDER/SN_Masks"
@@ -113,10 +113,10 @@ done
 
 #####################################################################################################################
 
-# ANALYSIS FOR OUTLIERS
+% ANALYSIS FOR OUTLIERS
 
-# Values with a high SD were visually checked. FSLnudge was used to adjust the mask of a few subjects due to artifacts or interference of vessels.
-# Resample the nudged mask to fit the space of the scan
+% Values with a high SD were visually checked. FSLnudge was used to adjust the mask of a few subjects due to artifacts or interference of vessels.
+% Resample the nudged mask to fit the space of the scan
 
 FLIRT -in $MASK_DIR/${MASK}/${SUBJ}_CP_L_${MASK}.nii -applyxfm -usesqform -ref $MASK_DIR/${MASK}/CP_R_${MASK}.nii -out $MASK_DIR/${MASK}/${SUBJ}_CP_L_${MASK}_v2.nii
 
